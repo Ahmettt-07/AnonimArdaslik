@@ -1,0 +1,244 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8">
+  <title>Sohbet Uygulaması</title>
+  <style>
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      display: flex;
+      min-height: 100vh;
+      background: #1a1a2e;
+      color: white;
+    }
+
+    .sidebar {
+      width: 250px;
+      background: #0f3460;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+
+    .sidebar h2 {
+      margin-bottom: 15px;
+    }
+
+    .sidebar ul {
+      list-style: none;
+      padding: 0;
+    }
+
+    .sidebar li {
+      padding: 10px;
+      background: #16213e;
+      margin-bottom: 10px;
+      cursor: pointer;
+      border-radius: 8px;
+      transition: background 0.3s;
+    }
+
+    .sidebar li:hover {
+      background: #1a1a3f;
+    }
+
+    .profile, .ads {
+      margin-top: 30px;
+      padding: 15px;
+      background: #1a1a3f;
+      border-radius: 10px;
+    }
+
+    .main {
+      flex: 1;
+      padding: 20px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    #roomName {
+      font-size: 1.5rem;
+      margin-bottom: 20px;
+    }
+
+    #nicknameForm, #chatBox {
+      max-width: 600px;
+      width: 100%;
+      margin: 0 auto;
+    }
+
+    #messages {
+      background: #0f3460;
+      padding: 15px;
+      height: 300px;
+      overflow-y: auto;
+      border-radius: 12px;
+      margin-bottom: 10px;
+      font-size: 0.95rem;
+      line-height: 1.5;
+    }
+
+    input, button {
+      padding: 12px;
+      border: none;
+      border-radius: 8px;
+      margin: 5px 0;
+      font-size: 1rem;
+    }
+
+    input {
+      width: 100%;
+      background: #1a1a2e;
+      color: white;
+      border: 1px solid #2c2c54;
+    }
+
+    button {
+      background: #00aaff;
+      color: white;
+      cursor: pointer;
+      transition: background 0.3s;
+      width: 100%;
+    }
+
+    button:hover {
+      background: #0088cc;
+    }
+
+    .hidden {
+      display: none;
+    }
+
+    .message {
+      margin-bottom: 10px;
+    }
+
+    .message strong {
+      color: #00d4ff;
+    }
+  </style>
+</head>
+<body>
+    <div class="sidebar">
+      <div>
+        <h2>Odalar</h2>
+        <ul>
+          <li onclick="joinRoom('Genel')"># Genel</li>
+          <li onclick="joinRoom('Oyun')"># Oyun</li>
+          <li onclick="joinRoom('Müzik')"># Müzik</li>
+          <li onclick="joinRoom('Yapay Zeka')"># Yapay Zeka</li>
+        </ul>
+      </div>
+      <div>
+        <div class="profile">
+          <h3>Profil</h3>
+          <p id="profileNick">Takma Ad: -</p>
+        </div>
+        <div class="ads">
+          <p><strong>Reklam:</strong><br> Bu alana reklam gelebilir</p>
+        </div>
+      </div>
+    </div>
+  
+    <div class="main">
+      <h1 id="roomName"># Oda Seç</h1>
+  
+      <div id="nicknameForm">
+        <input type="text" id="nickname" placeholder="Takma adınızı yazın">
+        <button onclick="joinChat()">Katıl</button>
+      </div>
+  
+      <div id="chatBox" class="hidden">
+        <div id="messages"></div>
+        <input type="text" id="messageInput" placeholder="Mesaj yaz..." onkeypress="handleKeyPress(event)">
+        <button onclick="sendMessage()">Gönder</button>
+      </div>
+    </div>
+  
+    <script>
+      let nickname = "";
+      let currentRoom = "";
+  
+      function joinChat() {
+        const input = document.getElementById("nickname");
+        nickname = input.value.trim();
+        if (!nickname) return alert("Lütfen takma ad girin.");
+  
+        document.getElementById("nicknameForm").classList.add("hidden");
+        document.getElementById("chatBox").classList.remove("hidden");
+        document.getElementById("profileNick").innerText = `Takma Ad: ${nickname}`;
+      }
+  
+      function joinRoom(room) {
+        if (!nickname) return alert("Lütfen önce takma adınızı girin.");
+  
+        currentRoom = room;
+        document.getElementById("roomName").innerText = `# ${room}`;
+        document.getElementById("messages").innerHTML = `<em>${room} odasına katıldınız.</em>`;
+      }
+  
+      function sendMessage() {
+        const input = document.getElementById("messageInput");
+        const msg = input.value.trim();
+        if (!msg) return;
+  
+        const messagesDiv = document.getElementById("messages");
+        const newMsg = document.createElement("div");
+        newMsg.className = "message";
+        newMsg.innerHTML = `<strong>${nickname}:</strong> ${msg}`;
+        messagesDiv.appendChild(newMsg);
+        messagesDiv.scrollTop = messagesDiv.scrollHeight;
+  
+        // Yapay zeka yanıtı
+        if (currentRoom === "Yapay Zeka") {
+          setTimeout(() => {
+            const botReply = document.createElement("div");
+            botReply.className = "message";
+            botReply.innerHTML = `<strong>AI:</strong> ${getAIResponse(msg)}`;
+            messagesDiv.appendChild(botReply);
+            messagesDiv.scrollTop = messagesDiv.scrollHeight;
+          }, 1000);
+        }
+  
+        input.value = "";
+      }
+  
+      function handleKeyPress(e) {
+        if (e.key === "Enter") sendMessage();
+      }
+  
+      // Yapay Zeka Yanıtları
+      function getAIResponse(userInput) {
+        const responses = {
+          "naber": "İyiyim, sen nasılsın?",
+          "merhaba": "Merhaba! Sana nasıl yardımcı olabilirim?",
+          "nasılsın": "Beni sorduğuna göre iyiyim. :) Sen nasılsın?",
+          "bugün nasılsın": "Bugün gayet iyiyim, teşekkürler. Sen nasılsın?",
+          "iyi": "Harika! Umarım her şey yolundadır.",
+          "kötü": "Üzgün olduğuna üzüldüm. Bir şeyler yapmak istersen buradayım!",
+          "ne yapıyorsun": "Sana yardımcı olmak için buradayım, her zaman iş başındayım!",
+        };
+  
+        // Kullanıcı mesajı ile eşleşen bir yanıt varsa onu döndür
+        for (let key in responses) {
+          if (userInput.toLowerCase().includes(key)) {
+            return responses[key];
+          }
+        }
+  
+        // Eğer özel bir yanıt bulunmazsa rastgele bir cevap ver
+        return "Hmm, bu konuda bir fikrim yok ama başka bir şey sorabilirsin!";
+      }
+    </script>
+  </body>
+  </html>
+  
+  
+  
